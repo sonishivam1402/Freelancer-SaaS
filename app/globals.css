@@ -92,3 +92,28 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Ensure calendar cells have correct styling */
+.react-calendar__tile {
+  border-radius: 50%;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Current day (Yellow) */
+.calendar-today {
+  background-color: #facc15 !important; /* Yellow */
+  color: black !important;
+}
+
+/* Selected day (Blue) */
+.calendar-selected {
+  background-color: #3b82f6 !important; /* Blue */
+  color: white !important;
+}
+
+/* Meeting day (Red) */
+.calendar-meeting {
+  background-color: #f26969 !important; /* Red */
+  color: white !important;
+}

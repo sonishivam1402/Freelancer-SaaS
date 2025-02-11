@@ -1,13 +1,44 @@
+import { useEffect, useState } from "react"
+import { collection, getDocs, Timestamp } from "firebase/firestore"
+import { db } from "@/lib/firebaseConfig"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
-const mockData = [
-  { id: 1, client: "John Doe", lastContact: "2023-05-01", status: "Replied" },
-  { id: 2, client: "Jane Smith", lastContact: "2023-05-03", status: "Pending" },
-  { id: 3, client: "Bob Johnson", lastContact: "2023-05-02", status: "Follow-up" },
-]
+interface Client {
+  id: string
+  Name: string
+  Email: string
+  last_contact: Timestamp
+  Status: string
+}
 
 export default function CRMDashboard() {
+  const [clients, setClients] = useState<Client[]>([])
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "clients"))
+        const clientData = querySnapshot.docs.map((doc) => {
+          const data = doc.data()
+          return {
+            id: doc.id,
+            Name: data.Name,
+            Email: data.Email,
+            last_contact: data.last_contact?.toDate().toLocaleString() || "N/A", // Convert Timestamp to string
+            Status: data.Status,
+          }
+        }) as Client[]
+
+        setClients(clientData)
+      } catch (error) {
+        console.error("Error fetching clients:", error)
+      }
+    }
+
+    fetchClients()
+  }, [])
+
   return (
     <Card>
       <CardHeader>
@@ -19,16 +50,18 @@ export default function CRMDashboard() {
           <TableHeader>
             <TableRow>
               <TableHead>Client</TableHead>
+              <TableHead>Email</TableHead>
               <TableHead>Last Contact</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mockData.map((row) => (
+            {clients.map((row) => (
               <TableRow key={row.id}>
-                <TableCell>{row.client}</TableCell>
-                <TableCell>{row.lastContact}</TableCell>
-                <TableCell>{row.status}</TableCell>
+                <TableCell>{row.Name}</TableCell>
+                <TableCell>{row.Email}</TableCell>
+                <TableCell>{row.last_contact}</TableCell>
+                <TableCell>{row.Status}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -37,4 +70,3 @@ export default function CRMDashboard() {
     </Card>
   )
 }
-
